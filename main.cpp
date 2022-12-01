@@ -11,10 +11,10 @@ int main ()
         };
         
         stack_ctor (&stk, n);
-        for (int i = 0; i < stk.size_of_buff; i++)
+        for (int i = 0; i < 20; i++)
             {   
-                scanf ("%d", &n);
-                push (&stk,n);
+                
+                push (&stk,i);
             }
         stack_dump (&stk);
         printf ("%d\n",pop(&stk));

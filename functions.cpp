@@ -52,6 +52,7 @@ void stack_dtor (struct stack *stk)
         free (stk->buffer);
         stk->num_of_elem = 0;
         stk->size_of_buff = 0;
+        stk->buffer = NULL;
     }
 
 void stack_dump (struct stack *stk)
