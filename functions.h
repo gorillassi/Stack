@@ -1,5 +1,5 @@
-#ifndef STACKH2
-#define STACKH2
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
 
 #include "stack.h"
 
@@ -13,4 +13,5 @@ void stack_dtor (struct stack *stk);
 
 void stack_dump (struct stack *stk);
 
+void stack_resize(struct stack *stk, size_t new_capacity);
 #endif
