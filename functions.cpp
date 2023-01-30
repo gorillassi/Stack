@@ -12,9 +12,10 @@ int stack_check (struct stack *stk)
 {
     assert(stk != nullptr);
 
-    stk -> errors = (stk-> buffer == nullptr) * BUFF_NULLPTR                              +
-                    (stk -> num_of_elem < 0) * SIZE_BELOW_NULL                            +
-                    (stk -> num_of_elem > stk -> size_of_buff) * SIZE_BIGGER_THAN_CAPACITY;   
+    stk -> errors = (stk-> buffer == nullptr) * BUFF_NULLPTR                               +
+                    (stk -> num_of_elem < 0) * SIZE_BELOW_NULL                             +
+                    (stk -> num_of_elem > stk -> size_of_buff) * SIZE_BIGGER_THAN_CAPACITY +
+                    (canary_alive(stk) * CANARY_NOT_ALIVE);   
     
     return stk->errors;
 }
@@ -43,8 +44,12 @@ void stack_error_decoder(stack* stk, const char* file_path)
         {
             fprintf(source,"ERROR_SIZE_BIGGER_THAN_CAPACITY");
         }
+        if(stk->errors & CANARY_NOT_ALIVE)
+        {
+            fprintf(source, "ERROR_CANARY_IS_NOT_ALIVE");
+        }
     }
-
+    
     fclose(source);
 }
 
@@ -126,18 +131,31 @@ void stack_dump (struct stack *stk, const char* file_path)
     fprintf(source, "capacity         = %d\n", stk->num_of_elem);
     fprintf(source, "adress of buffer = %p\n", &stk->buffer);
     fprintf(source, " \n");
+
     fprintf (source ,"-----------DUMP----------\n");
     fprintf (source,     "_________________________\n");
     fprintf (source ,"position | value | adress\n");
+    
     for (int i = 0; i < stk->size_of_buff; i++)
     {
         fprintf (source ,"_________________________\n");
         fprintf (source, "%8d | %5d | %p\n", i, stk->buffer[i], &stk->buffer[i]);   
     } 
     fprintf (source,     "_________________________\n"); 
+
     fclose(source);
     fprintf (source," \n");
-    stack_error_decoder(stk , file_path);
+    stack_error_decoder(stk , file_path); 
+}
 
-    
+int canary_alive(stack *stk)
+{
+    if((stk->left_canary != CANARYVALUE) && (stk->right_canary != CANARYVALUE))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
