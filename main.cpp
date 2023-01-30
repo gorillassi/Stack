@@ -12,14 +12,14 @@ int main ()
         
         stack_ctor (&stk, capacity);
         
-        for (int i = 0; i < capacity + 2; i++)
+        for (int i = 0; i < capacity; i++)
         {   
             int tt = 0;
             scanf("%d", &tt);
             push(&stk, tt);
             
         }
-        
+
         //pop(&stk); 
 
         stack_dump (&stk, "/home/gorilla/Documents/GitHub/Stack/data.txt");
