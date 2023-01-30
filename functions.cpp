@@ -8,26 +8,44 @@ void* recalloc(void* ptr, size_t num, size_t Size) {
     return ptr;
 }
 
-void stack_check (struct stack *stk)
+int stack_check (struct stack *stk)
 {
-    if (stk->buffer == nullptr)
-        {
-            printf ("ERROR NULLPTR");
+    assert(stk != nullptr);
 
-            abort ();
-        }
+    stk -> errors = (stk-> buffer == nullptr) * BUFF_NULLPTR                              +
+                    (stk -> num_of_elem < 0) * SIZE_BELOW_NULL                            +
+                    (stk -> num_of_elem > stk -> size_of_buff) * SIZE_BIGGER_THAN_CAPACITY;   
+    
+    return stk->errors;
+}
 
-    if (stk->num_of_elem > stk->size_of_buff)
-        {
-            printf ("ERROR OUT OF RANGE");
-            abort ();
-        }
+void stack_error_decoder(stack* stk, const char* file_path)
+{
+    assert(stk != nullptr);
+    
+    FILE *source = fopen(file_path, "a");
 
-    if (stk->num_of_elem < 0)
+    if(stk-> errors == 0)
+    {
+        fprintf(source, "NO ERROR\n");
+    }
+    else
+    {
+        if(stk->errors & BUFF_NULLPTR)
         {
-            printf ("ERROR OUT OF RANGE");
-            abort ();
+            fprintf(source,"ERROR_BUFFER_NULLPTR");
         }
+        if(stk->errors & SIZE_BELOW_NULL)
+        {
+            fprintf(source,"ERROR_SIZE_BELOW_NULL");
+        }
+        if(stk->errors & SIZE_BIGGER_THAN_CAPACITY)
+        {
+            fprintf(source,"ERROR_SIZE_BIGGER_THAN_CAPACITY");
+        }
+    }
+
+    fclose(source);
 }
 
 void stack_resize(struct stack *stk, size_t new_capacity)
@@ -59,6 +77,7 @@ void push (struct stack *stk, elem_t value)
     stk->num_of_elem++;
     stack_check (stk);
 }
+
 elem_t pop (struct stack *stk)
 {
     stack_check (stk);   
@@ -85,21 +104,40 @@ void stack_ctor (struct stack *stk, int num)
 
 void stack_dtor (struct stack *stk)
 {
-    free (stk->buffer);
+    for (size_t i = 0; i < stk-> size_of_buff; i++)
+    {
+        stk->buffer[i] = 228;
+    }
+    
+
     stk->num_of_elem = 0;
     stk->size_of_buff = 0;
     stk->buffer = nullptr;
+    free (stk->buffer);
 }
 
-void stack_dump (struct stack *stk)
+void stack_dump (struct stack *stk, const char* file_path)
 {
-    printf ("________________\n");
-    printf ("position | value\n");
+    assert(stk != nullptr);
+
+    FILE *source = fopen(file_path, "wb");
+
+    fprintf(source, "size             = %d\n", stk->size_of_buff);
+    fprintf(source, "capacity         = %d\n", stk->num_of_elem);
+    fprintf(source, "adress of buffer = %p\n", &stk->buffer);
+    fprintf(source, " \n");
+    fprintf (source ,"-----------DUMP----------\n");
+    fprintf (source,     "_________________________\n");
+    fprintf (source ,"position | value | adress\n");
     for (int i = 0; i < stk->size_of_buff; i++)
     {
-        printf ("________________\n");
-        printf ("%8d | %5d\n", i+1, stk->buffer[i]);   
+        fprintf (source ,"_________________________\n");
+        fprintf (source, "%8d | %5d | %p\n", i, stk->buffer[i], &stk->buffer[i]);   
     } 
-    printf ("________________\n"); 
-}
+    fprintf (source,     "_________________________\n"); 
+    fclose(source);
+    fprintf (source," \n");
+    stack_error_decoder(stk , file_path);
 
+    
+}

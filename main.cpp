@@ -18,16 +18,12 @@ int main ()
             scanf("%d", &tt);
             push(&stk, tt);
             
-        }pop(&stk);
-        // pop(&stk);
-        // pop(&stk);
-        // pop(&stk);
+        }
         
-        
-        //printf ("%d\n",pop(&stk));
-        //stack_dtor (&stk);
-        // 
+        //pop(&stk); 
 
-        stack_dump (&stk);
+        stack_dump (&stk, "/home/gorilla/Documents/GitHub/Stack/data.txt");
+
+        stack_dtor (&stk);
         return 0;
     }
