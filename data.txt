@@ -1,7 +1,7 @@
 size             = 16
 capacity         = 10
 adress of buffer = 0x7ffd105ea868
- 
+
 -----------DUMP----------
 _________________________
 position | value | adress
