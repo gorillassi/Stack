@@ -8,6 +8,18 @@ void* recalloc(void* ptr, size_t num, size_t Size) {
     return ptr;
 }
 
+int canary_alive(stack *stk)
+{
+    if((stk->left_canary != CANARYVALUE) && (stk->right_canary != CANARYVALUE))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 int stack_check (struct stack *stk)
 {
     assert(stk != nullptr);
@@ -49,13 +61,15 @@ void stack_error_decoder(stack* stk, const char* file_path)
             fprintf(source, "ERROR_CANARY_IS_NOT_ALIVE");
         }
     }
-    
+
     fclose(source);
 }
 
 void stack_resize(struct stack *stk, size_t new_capacity)
 {
+    assert(new_capacity > 0);
     stack_check(stk);
+    ASSERT_OK(stk);
     stk->buffer = (elem_t*)recalloc(stk->buffer,new_capacity,sizeof(elem_t));
 
     if(stk->size_of_buff < new_capacity)
@@ -72,7 +86,7 @@ void stack_resize(struct stack *stk, size_t new_capacity)
 void push (struct stack *stk, elem_t value)
 {
     stack_check (stk);
-
+    ASSERT_OK(stk);
     if(stk->num_of_elem >= stk->size_of_buff)
     {
         stack_resize(stk, 2 * stk->size_of_buff);
@@ -83,8 +97,9 @@ void push (struct stack *stk, elem_t value)
     stack_check (stk);
 }
 
-elem_t pop (struct stack *stk)
+elem_t pop(struct stack *stk)
 {
+    ASSERT_OK(stk);
     stack_check (stk);   
     stk->num_of_elem--;
     elem_t temp = stk->buffer[stk->num_of_elem];
@@ -109,6 +124,8 @@ void stack_ctor (struct stack *stk, int num)
 
 void stack_dtor (struct stack *stk)
 {
+    assert(stk != nullptr);
+    ASSERT_OK(stk);
     for (size_t i = 0; i < stk-> size_of_buff; i++)
     {
         stk->buffer[i] = 228;
@@ -148,14 +165,3 @@ void stack_dump (struct stack *stk, const char* file_path)
     stack_error_decoder(stk , file_path); 
 }
 
-int canary_alive(stack *stk)
-{
-    if((stk->left_canary != CANARYVALUE) && (stk->right_canary != CANARYVALUE))
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
